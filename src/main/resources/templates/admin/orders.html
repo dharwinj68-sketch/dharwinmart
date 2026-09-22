@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Orders - Admin DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Customer Orders Management</h2>
+                    <p class="section-subtitle">Track incoming orders, inspect item details, and view customer contacts</p>
+                </div>
+                <a th:href="@{/admin}" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(orders)}" style="background: var(--white); padding: 4rem 1rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📦</div>
+                <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">No Orders Placed Yet</h3>
+                <p style="color: var(--gray-600); margin-bottom: 1.5rem;">When customers check out through the storefront, orders will show up here.</p>
+                <a th:href="@{/}" class="btn btn-primary">Go to Storefront</a>
+            </div>
+
+            <!-- Orders Table -->
+            <div th:unless="${#lists.isEmpty(orders)}" class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Order Date</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th style="text-align: center;">Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td>
+                                <strong style="color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</strong>
+                            </td>
+                            <td>
+                                <strong th:text="${order.customerName}" style="color: var(--dark);">Customer</strong>
+                            </td>
+                            <td th:text="${order.email}">email</td>
+                            <td th:text="${order.phone}">phone</td>
+                            <td th:text="${#temporals.format(order.orderDate, 'dd-MMM-yyyy HH:mm')}">Date</td>
+                            <td style="font-weight: 700; color: var(--dark);" th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                            <td>
+                                <span class="card-badge-stock stock-in" style="position: static;" th:text="${order.status}">PLACED</span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                    Inspect Order →
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

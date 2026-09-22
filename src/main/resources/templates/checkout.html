@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Stock Error or General Error -->
+            <div th:if="${stockError}" class="alert alert-danger">
+                <span th:text="${stockError}">Stock error</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${generalError}" class="alert alert-danger">
+                <span th:text="${generalError}">General error</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Order Checkout</h2>
+                    <p class="section-subtitle">Please provide your shipping and contact information</p>
+                </div>
+            </div>
+
+            <!-- Checkout Layout -->
+            <div class="cart-layout">
+                <!-- Shipping Details Form -->
+                <div class="form-card">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--dark); margin-bottom: 1.5rem;">
+                        📍 Delivery Information
+                    </h3>
+
+                    <form th:action="@{/checkout}" th:object="${checkoutForm}" method="post">
+                        <!-- Customer Name -->
+                        <div class="form-group">
+                            <label class="form-label" for="customerName">Full Name *</label>
+                            <input type="text" id="customerName" th:field="*{customerName}" 
+                                   class="form-control" th:classappend="${#fields.hasErrors('customerName')} ? 'is-invalid' : ''"
+                                   placeholder="e.g. Dharwin Kumar">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}">
+                                Name error
+                            </div>
+                        </div>
+
+                        <!-- Email & Phone in 2 cols -->
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label class="form-label" for="email">Email Address *</label>
+                                <input type="email" id="email" th:field="*{email}" 
+                                       class="form-control" th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                       placeholder="dharwin@example.com">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
+                                    Email error
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="phone">Phone Number *</label>
+                                <input type="text" id="phone" th:field="*{phone}" 
+                                       class="form-control" th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid' : ''"
+                                       placeholder="+91 98765 43210">
+                                <div class="invalid-feedback" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">
+                                    Phone error
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div class="form-group">
+                            <label class="form-label" for="address">Delivery Street Address *</label>
+                            <textarea id="address" th:field="*{address}" rows="3" 
+                                      class="form-control" th:classappend="${#fields.hasErrors('address')} ? 'is-invalid' : ''"
+                                      placeholder="Room / Flat No, Hostel / Street, City, State, PIN Code"></textarea>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('address')}" th:errors="*{address}">
+                                Address error
+                            </div>
+                        </div>
+
+                        <!-- Payment Method Selection -->
+                        <div class="form-group" style="margin-top: 2rem;">
+                            <label class="form-label">Payment Method</label>
+                            <div style="background-color: var(--gray-50); border: 2px solid var(--primary); border-radius: var(--radius-md); padding: 1.25rem;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; font-weight: 600;">
+                                    <input type="radio" name="paymentMethod" value="COD" checked style="accent-color: var(--primary); width: 18px; height: 18px;">
+                                    <span>💵 Cash on Delivery / Demo Order</span>
+                                </label>
+                                <p style="font-size: 0.85rem; color: var(--gray-600); margin-left: 1.85rem; margin-top: 0.35rem;">
+                                    Pay securely upon parcel delivery or test seamlessly in Demo MVP mode. No real card required.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem;">
+                            <button type="submit" class="btn btn-primary btn-block" style="padding: 0.9rem; font-size: 1.05rem;">
+                                ✓ Confirm & Place Order (₹<span th:text="${#numbers.formatDecimal(cart.totalAmount, 1, 'COMMA', 2, 'POINT')}">0.00</span>)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Order Summary Sidebar -->
+                <div class="cart-summary-box">
+                    <h3 class="summary-title">Items in Order (<span th:text="${cart.totalQuantity}">0</span>)</h3>
+
+                    <div style="max-height: 280px; overflow-y: auto; margin-bottom: 1.25rem; padding-right: 0.25rem;">
+                        <div th:each="item : ${cart.items}" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; font-size: 0.9rem;">
+                            <div>
+                                <strong th:text="${item.product.name}" style="color: var(--dark); display: block;">Item Name</strong>
+                                <span style="color: var(--gray-500); font-size: 0.8rem;" th:text="'Qty: ' + ${item.quantity} + ' × ₹' + ${#numbers.formatDecimal(item.product.price, 1, 'COMMA', 2, 'POINT')}">Qty</span>
+                            </div>
+                            <span style="font-weight: 700; color: var(--dark);" th:text="'₹' + ${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>Items Subtotal</span>
+                        <span th:text="'₹' + ${#numbers.formatDecimal(cart.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Delivery Charge</span>
+                        <span style="color: var(--accent); font-weight: 600;">FREE</span>
+                    </div>
+
+                    <div class="summary-total">
+                        <span>Total Payable</span>
+                        <span style="color: var(--primary);" th:text="'₹' + ${#numbers.formatDecimal(cart.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</span>
+                    </div>
+
+                    <div style="margin-top: 1.5rem;">
+                        <a th:href="@{/cart}" class="btn btn-outline btn-block">← Edit Cart</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

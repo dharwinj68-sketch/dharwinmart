@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Order #' + ${order.id} + ' Details - Admin DHARWINMART'">Order Details - Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container" style="max-width: 920px;">
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" th:text="'Order #' + ${order.id} + ' Summary'">Order Details</h2>
+                    <p class="section-subtitle">Full order breakdown, purchased items, and shipping address</p>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a th:href="@{/admin/orders}" class="btn btn-secondary">← Back to Orders</a>
+                    <a th:href="@{/admin}" class="btn btn-outline">Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Card Layout -->
+            <div class="form-card" style="padding: 2.5rem;">
+                <!-- Header Info -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 1.5rem; border-bottom: 1px solid var(--gray-200); margin-bottom: 2rem;">
+                    <div>
+                        <span style="font-size: 0.8rem; color: var(--gray-500); text-transform: uppercase; font-weight: 700;">Order Reference</span>
+                        <h3 style="font-size: 1.6rem; font-weight: 800; color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</h3>
+                        <div style="font-size: 0.88rem; color: var(--gray-600); margin-top: 0.25rem;">
+                            Placed on: <span th:text="${#temporals.format(order.orderDate, 'dd MMMM yyyy, HH:mm:ss')}">Timestamp</span>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="card-badge-stock stock-in" style="position: static; font-size: 0.9rem; padding: 0.4rem 1rem;" th:text="${order.status}">
+                            PLACED
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Customer Details Grid -->
+                <div class="receipt-grid" style="margin-bottom: 2.5rem;">
+                    <div style="background-color: var(--gray-50); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 0.75rem;">👤 Customer Information</h4>
+                        <p style="margin-bottom: 0.35rem;"><strong th:text="${order.customerName}">Customer Name</strong></p>
+                        <p style="color: var(--gray-600); font-size: 0.88rem; margin-bottom: 0.25rem;">📧 <span th:text="${order.email}">email</span></p>
+                        <p style="color: var(--gray-600); font-size: 0.88rem;">📞 <span th:text="${order.phone}">phone</span></p>
+                    </div>
+
+                    <div style="background-color: var(--gray-50); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--gray-200);">
+                        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--dark); margin-bottom: 0.75rem;">📦 Delivery Destination</h4>
+                        <p style="color: var(--gray-700); font-size: 0.9rem; line-height: 1.6;" th:text="${order.address}">Shipping address</p>
+                        <div style="margin-top: 0.75rem; font-size: 0.82rem; color: var(--accent-hover); font-weight: 600;">
+                            ✓ Payment Method: Cash on Delivery / Demo
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Itemized Breakdown -->
+                <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem;">Items In This Order</h4>
+                <div class="data-table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th style="text-align: right;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${order.items}">
+                                <td>
+                                    <strong th:text="${item.product.name}" style="color: var(--dark);">Product Name</strong>
+                                </td>
+                                <td>
+                                    <span class="card-badge-category" style="position: static; font-size: 0.72rem;" th:text="${item.product.category}">Category</span>
+                                </td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                                <td th:text="${item.quantity}">1</td>
+                                <td style="text-align: right; font-weight: 700; color: var(--dark);"
+                                    th:text="'₹' + ${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">
+                                    ₹0.00
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" style="text-align: right; font-weight: 700; font-size: 1rem;">Total Order Value:</td>
+                                <td style="text-align: right; font-size: 1.3rem; font-weight: 800; color: var(--primary);"
+                                    th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">
+                                    ₹0.00
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

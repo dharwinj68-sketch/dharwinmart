@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<footer th:fragment="footer" class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div>
+                <div class="brand-logo" style="color: var(--white); margin-bottom: 1rem;">
+                    <span class="brand-badge">DM</span>
+                    <span>DHARWINMART</span>
+                </div>
+                <p style="color: var(--gray-400); font-size: 0.95rem; max-width: 360px;">
+                    A clean, functional, student-friendly Capstone e-commerce application engineered with Spring Boot, JPA, H2 Database, and Thymeleaf.
+                </p>
+                <div style="margin-top: 1rem; font-size: 0.82rem; color: #a5b4fc;">
+                    ⚡ Monolithic Spring Boot Architecture • Session-based Cart • H2 File DB
+                </div>
+            </div>
+            <div>
+                <h4 class="footer-title">Product Categories</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/products?category=Electronics}">Electronics</a></li>
+                    <li><a th:href="@{/products?category=Fashion}">Fashion</a></li>
+                    <li><a th:href="@{/products?category=Home}">Home & Living</a></li>
+                    <li><a th:href="@{/products?category=Books}">Books & Education</a></li>
+                    <li><a th:href="@{/products?category=Accessories}">Accessories</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Quick Access</h4>
+                <ul class="footer-links">
+                    <li><a th:href="@{/}">Storefront Home</a></li>
+                    <li><a th:href="@{/products}">Browse All Products</a></li>
+                    <li><a th:href="@{/cart}">Shopping Cart</a></li>
+                    <li><a th:href="@{/admin}">Admin Dashboard (Demo)</a></li>
+                    <li><a th:href="@{/h2-console}" target="_blank">H2 Database Console</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 DHARWINMART E-Commerce Capstone Project. Built for Academic & Viva Presentation.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

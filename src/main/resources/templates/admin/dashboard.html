@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Demo Banner -->
+            <div class="admin-badge-demo">
+                <span style="font-size: 1.25rem;">ℹ️</span>
+                <div>
+                    <strong>Demo / MVP Notice:</strong> This Admin portal is configured for open educational demonstrations and viva presentations. Complex multi-user authentication is intentionally omitted to keep setup frictionless.
+                </div>
+            </div>
+
+            <!-- Dashboard Title & Actions -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">Admin Dashboard</h2>
+                    <p class="section-subtitle">Real-time overview of DHARWINMART inventory & orders</p>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a th:href="@{/admin/products/new}" class="btn btn-primary">+ Add New Product</a>
+                    <a th:href="@{/admin/products}" class="btn btn-outline">Manage Products</a>
+                    <a th:href="@{/admin/orders}" class="btn btn-secondary">All Orders</a>
+                </div>
+            </div>
+
+            <!-- Metric KPI Cards -->
+            <div class="admin-stats-grid">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="${totalProducts}">0</div>
+                        <div class="stat-label">Total Products</div>
+                    </div>
+                    <div class="stat-icon">📦</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="${totalOrders}">0</div>
+                        <div class="stat-label">Total Orders Placed</div>
+                    </div>
+                    <div class="stat-icon">🛍️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="${totalCategories}">0</div>
+                        <div class="stat-label">Active Categories</div>
+                    </div>
+                    <div class="stat-icon">🏷️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" style="color: var(--accent); font-size: 1.85rem;">H2 File</div>
+                        <div class="stat-label">Database Persistence</div>
+                    </div>
+                    <div class="stat-icon">💾</div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Section -->
+            <div class="section-header" style="margin-top: 2rem;">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark);">Recent Orders</h3>
+                    <p class="section-subtitle">Latest customer purchases across the store</p>
+                </div>
+                <a th:href="@{/admin/orders}" class="btn btn-outline">View All Orders →</a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(recentOrders)}" style="background: var(--white); padding: 3rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                <p style="color: var(--gray-500); font-size: 1rem;">No orders have been placed yet. Place a demo order through the storefront!</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(recentOrders)}" class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Date & Time</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${recentOrders}">
+                            <td>
+                                <strong style="color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</strong>
+                            </td>
+                            <td th:text="${order.customerName}">Customer</td>
+                            <td th:text="${order.email}">email</td>
+                            <td th:text="${#temporals.format(order.orderDate, 'dd-MMM-yyyy HH:mm')}">Date</td>
+                            <td style="font-weight: 700;" th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                            <td>
+                                <span class="card-badge-stock stock-in" style="position: static;" th:text="${order.status}">PLACED</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/orders/{id}(id=${order.id})}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                    View Details
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

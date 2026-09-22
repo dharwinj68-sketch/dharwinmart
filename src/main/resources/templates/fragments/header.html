@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+</head>
+<body>
+<header th:fragment="navbar" class="navbar">
+    <div class="container nav-container">
+        <!-- Logo -->
+        <a th:href="@{/}" class="brand-logo">
+            <span class="brand-badge">DM</span>
+            <span>DHARWINMART</span>
+        </a>
+
+        <!-- Search Bar -->
+        <div class="nav-search">
+            <form th:action="@{/search}" method="get" class="search-form">
+                <span class="search-icon">🔍</span>
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="Search products, brands, tech..." class="search-input" required>
+            </form>
+        </div>
+
+        <!-- Navigation Links & Actions -->
+        <ul class="nav-links">
+            <li><a th:href="@{/}" class="nav-link">Home</a></li>
+            <li><a th:href="@{/products}" class="nav-link">Products</a></li>
+            <li><a th:href="@{/products?category=Electronics}" class="nav-link">Electronics</a></li>
+            <li><a th:href="@{/products?category=Fashion}" class="nav-link">Fashion</a></li>
+            <li><a th:href="@{/products?category=Home}" class="nav-link">Home</a></li>
+            <li><a th:href="@{/products?category=Books}" class="nav-link">Books</a></li>
+            <li><a th:href="@{/products?category=Accessories}" class="nav-link">Accessories</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a th:href="@{/cart}" class="cart-button">
+                <span>🛒 Cart</span>
+                <span class="cart-badge" th:text="${cartItemCount}">0</span>
+            </a>
+            <a th:if="${session.currentUser == null}" th:href="@{/login}" class="btn btn-outline" style="padding: 0.45rem 0.85rem; font-size: 0.85rem;">
+                Sign In
+            </a>
+            <span th:if="${session.currentUser != null}" style="font-size: 0.85rem; color: var(--gray-700); display: flex; align-items: center; gap: 0.35rem;">
+                <span>👤 <strong th:text="${session.currentUser}">User</strong></span>
+                <a th:href="@{/logout}" style="color: var(--danger); font-size: 0.78rem; text-decoration: underline;" title="Log out of account">(Logout)</a>
+            </span>
+            <a th:href="@{/admin}" class="admin-nav-btn" title="Open Demo Admin Dashboard">
+                ⚙️ Admin
+            </a>
+        </div>
+    </div>
+</header>
+</body>
+</html>

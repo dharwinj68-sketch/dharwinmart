@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - DHARWINMART'">Product Details - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Breadcrumbs -->
+            <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--gray-600);">
+                <a th:href="@{/}">Home</a> &gt; 
+                <a th:href="@{/products(category=${product.category})}" th:text="${product.category}">Category</a> &gt; 
+                <span th:text="${product.name}" style="color: var(--dark); font-weight: 600;">Product</span>
+            </div>
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Product Details Container -->
+            <div class="detail-layout">
+                <!-- Product Image -->
+                <div class="detail-img-wrap">
+                    <img th:src="${product.imageUrl}" th:alt="${product.name}">
+                </div>
+
+                <!-- Product Information -->
+                <div class="detail-info">
+                    <span class="detail-category" th:text="${product.category}">Category</span>
+                    <h1 class="detail-title" th:text="${product.name}">Product Name</h1>
+                    
+                    <div class="detail-price" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">
+                        ₹1,499.00
+                    </div>
+
+                    <div class="detail-desc" th:text="${product.description}">
+                        Detailed description of the product and its features.
+                    </div>
+
+                    <!-- Stock Status Indicator -->
+                    <div class="detail-meta-item">
+                        <strong style="font-size: 0.9rem; color: var(--gray-700);">Availability:</strong>
+                        <span th:if="${!product.outOfStock}" class="card-badge-stock stock-in" style="position: static;"
+                              th:text="'In Stock (' + ${product.stock} + ' available)'">
+                            In Stock
+                        </span>
+                        <span th:if="${product.outOfStock}" class="card-badge-stock stock-out" style="position: static;">
+                            Out of Stock
+                        </span>
+                    </div>
+
+                    <!-- Add to Cart Form with Quantity Selector -->
+                    <form th:action="@{/cart/add}" method="post" style="margin-top: 1rem;">
+                        <input type="hidden" name="productId" th:value="${product.id}">
+                        
+                        <div class="detail-meta-item" th:if="${!product.outOfStock}">
+                            <label for="qty" style="font-size: 0.9rem; font-weight: 600; color: var(--gray-700);">Quantity:</label>
+                            <div class="quantity-control">
+                                <button type="button" class="qty-btn qty-decrement">-</button>
+                                <input type="number" id="qty" name="quantity" value="1" min="1" th:max="${product.stock}" class="qty-input" readonly>
+                                <button type="button" class="qty-btn qty-increment">+</button>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1rem;" th:disabled="${product.outOfStock}">
+                                <span th:if="${!product.outOfStock}">🛒 Add to Cart</span>
+                                <span th:if="${product.outOfStock}">Out of Stock</span>
+                            </button>
+                            <a th:href="@{/products}" class="btn btn-secondary" style="padding: 0.8rem 1.5rem;">
+                                ← Continue Browsing
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Fast Campus Dispatch Info -->
+                    <div style="margin-top: 2.5rem; padding: 1rem; background-color: var(--gray-50); border-radius: var(--radius-md); border: 1px dashed var(--gray-300); font-size: 0.85rem; color: var(--gray-700);">
+                        <p>✓ <strong>Cash on Delivery:</strong> Pay at doorstep with demo verification</p>
+                        <p>✓ <strong>Guaranteed Quality:</strong> 100% verified campus tech & essentials</p>
+                        <p>✓ <strong>Fast Delivery:</strong> Same-day or next-day delivery</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

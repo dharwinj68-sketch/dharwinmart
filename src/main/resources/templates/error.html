@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notice - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container" style="max-width: 650px;">
+
+            <div class="form-card" style="text-align: center; padding: 3.5rem 2rem;">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">⚠️</div>
+                
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--dark); margin-bottom: 1rem;" 
+                    th:text="${errorTitle != null} ? ${errorTitle} : 'Notice'">
+                    Notice
+                </h1>
+                
+                <p style="color: var(--gray-600); font-size: 1.05rem; line-height: 1.7; margin-bottom: 2rem;" 
+                   th:text="${errorMessage != null} ? ${errorMessage} : 'We encountered an unexpected condition while processing your request.'">
+                    Something went wrong.
+                </p>
+
+                <div style="display: flex; justify-content: center; gap: 1rem;">
+                    <a th:href="@{/}" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+                        Back to Home
+                    </a>
+                    <a th:href="@{/products}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+                        Browse Products
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${isEdit} ? 'Edit Product - Admin' : 'Add New Product - Admin'">Product Form - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container" style="max-width: 800px;">
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" th:text="${isEdit} ? 'Edit Product' : 'Add New Product'">Add / Edit Product</h2>
+                    <p class="section-subtitle">Configure product metadata, pricing, category, and inventory levels</p>
+                </div>
+                <a th:href="@{/admin/products}" class="btn btn-secondary">← Back to Products</a>
+            </div>
+
+            <!-- Product Form Card -->
+            <div class="form-card">
+                <form th:action="@{/admin/products/save}" th:object="${productForm}" method="post">
+                    <!-- Hidden ID for edit mode -->
+                    <input type="hidden" th:field="*{id}">
+
+                    <!-- Product Name -->
+                    <div class="form-group">
+                        <label class="form-label" for="name">Product Name *</label>
+                        <input type="text" id="name" th:field="*{name}" class="form-control"
+                               th:classappend="${#fields.hasErrors('name')} ? 'is-invalid' : ''"
+                               placeholder="e.g. Ergonomic Bluetooth Keyboard">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
+                            Product name is required
+                        </div>
+                    </div>
+
+                    <!-- Category & Stock (2 cols) -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="category">Category *</label>
+                            <select id="category" th:field="*{category}" class="form-control"
+                                    th:classappend="${#fields.hasErrors('category')} ? 'is-invalid' : ''">
+                                <option value="">-- Select a Category --</option>
+                                <option value="Electronics">Electronics</option>
+                                <option value="Fashion">Fashion</option>
+                                <option value="Home">Home</option>
+                                <option value="Books">Books</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('category')}" th:errors="*{category}">
+                                Category is required
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="stock">Available Stock *</label>
+                            <input type="number" id="stock" th:field="*{stock}" min="0" class="form-control"
+                                   th:classappend="${#fields.hasErrors('stock')} ? 'is-invalid' : ''"
+                                   placeholder="e.g. 25">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}">
+                                Stock cannot be negative
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price (in INR) -->
+                    <div class="form-group">
+                        <label class="form-label" for="price">Price (₹) *</label>
+                        <input type="number" step="0.01" id="price" th:field="*{price}" min="0.01" class="form-control"
+                               th:classappend="${#fields.hasErrors('price')} ? 'is-invalid' : ''"
+                               placeholder="e.g. 1499.00">
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('price')}" th:errors="*{price}">
+                            Price must be greater than 0
+                        </div>
+                    </div>
+
+                    <!-- Image URL -->
+                    <div class="form-group">
+                        <label class="form-label" for="imageUrl">Image URL</label>
+                        <input type="url" id="imageUrl" th:field="*{imageUrl}" class="form-control"
+                               placeholder="https://images.unsplash.com/photo-...">
+                        <small style="color: var(--gray-500); font-size: 0.8rem; display: block; margin-top: 0.35rem;">
+                            Leave blank to use a default placeholder image.
+                        </small>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="form-group">
+                        <label class="form-label" for="description">Product Description</label>
+                        <textarea id="description" th:field="*{description}" rows="4" class="form-control"
+                                  placeholder="Describe the product specifications, highlights, and dimensions..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+                            <span th:text="${isEdit} ? 'Update Product' : 'Create Product'">Save Product</span>
+                        </button>
+                        <a th:href="@{/admin/products}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

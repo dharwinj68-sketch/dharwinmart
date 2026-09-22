@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <div class="confirmation-card">
+                <!-- Header Icon & Status -->
+                <div class="confirm-header">
+                    <div class="confirm-icon">✓</div>
+                    <h1 style="font-size: 2rem; font-weight: 800; color: var(--dark); margin-bottom: 0.5rem;">
+                        Order placed successfully!
+                    </h1>
+                    <p style="color: var(--gray-600); font-size: 1rem;">
+                        Thank you for your purchase at <strong>DHARWINMART</strong>. We have received your order and are preparing it for delivery.
+                    </p>
+                    <div style="display: inline-block; margin-top: 1rem; background-color: var(--accent-light); color: var(--accent-hover); font-weight: 700; padding: 0.35rem 1rem; border-radius: var(--radius-full); font-size: 0.85rem;">
+                        Order Status: <span th:text="${order.status}">PLACED</span>
+                    </div>
+                </div>
+
+                <!-- Order Key Details Grid -->
+                <div class="receipt-grid">
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--gray-500); text-transform: uppercase; font-weight: 700; display: block;">Order Reference</span>
+                        <strong style="font-size: 1.15rem; color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</strong>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--gray-500); text-transform: uppercase; font-weight: 700; display: block;">Order Date & Time</span>
+                        <span style="font-weight: 600; color: var(--dark);" th:text="${#temporals.format(order.orderDate, 'dd MMMM yyyy, HH:mm')}">Date</span>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--gray-500); text-transform: uppercase; font-weight: 700; display: block;">Customer Name</span>
+                        <strong th:text="${order.customerName}" style="color: var(--dark);">Customer</strong>
+                        <div style="font-size: 0.85rem; color: var(--gray-600);" th:text="${order.email}">email</div>
+                        <div style="font-size: 0.85rem; color: var(--gray-600);" th:text="${order.phone}">phone</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.82rem; color: var(--gray-500); text-transform: uppercase; font-weight: 700; display: block;">Delivery Address</span>
+                        <p style="color: var(--gray-700); font-size: 0.9rem;" th:text="${order.address}">Address</p>
+                    </div>
+                </div>
+
+                <!-- Itemized Order Table -->
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--gray-200);">
+                    Ordered Items
+                </h3>
+
+                <div class="data-table-wrap" style="margin-bottom: 2rem;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th style="text-align: right;">Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="item : ${order.items}">
+                                <td>
+                                    <strong th:text="${item.product.name}" style="color: var(--dark);">Item Name</strong>
+                                    <div style="font-size: 0.8rem; color: var(--gray-500);" th:text="${item.product.category}">Category</div>
+                                </td>
+                                <td th:text="'₹' + ${#numbers.formatDecimal(item.price, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                                <td th:text="${item.quantity}">1</td>
+                                <td style="text-align: right; font-weight: 700; color: var(--dark);" 
+                                    th:text="'₹' + ${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')}">
+                                    ₹0.00
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="text-align: right; font-weight: 700; font-size: 1rem;">Total Amount Paid / COD:</td>
+                                <td style="text-align: right; font-size: 1.25rem; font-weight: 800; color: var(--primary);"
+                                    th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">
+                                    ₹0.00
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <!-- Call to Action -->
+                <div style="text-align: center; margin-top: 2rem;">
+                    <a th:href="@{/products}" class="btn btn-primary" style="padding: 0.8rem 2.5rem; font-size: 1rem;">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

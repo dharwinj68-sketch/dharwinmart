@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - DHARWINMART'">Products - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Category Strip -->
+    <div class="category-strip">
+        <div class="container">
+            <div class="category-scroll">
+                <a th:href="@{/products}" class="cat-pill" 
+                   th:classappend="${selectedCategory == 'All' or selectedCategory == null} ? 'active' : ''">
+                    All Products
+                </a>
+                <a th:each="cat : ${categories}" 
+                   th:href="@{/products(category=${cat})}" 
+                   class="cat-pill" 
+                   th:classappend="${selectedCategory == cat} ? 'active' : ''"
+                   th:text="${cat}">Category</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Page Title & Search Status Header -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title" th:if="${isSearch}" th:text="'Search results for: ' + ${keyword}">Search Results</h2>
+                    <h2 class="section-title" th:unless="${isSearch}" th:text="${pageTitle}">All Products</h2>
+                    <p class="section-subtitle" th:text="${#lists.size(products)} + ' item(s) found in catalog'">Total items found</p>
+                </div>
+            </div>
+
+            <!-- Empty State if no products found -->
+            <div th:if="${#lists.isEmpty(products)}" style="text-align: center; padding: 4rem 1rem; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">No products found.</h3>
+                <p style="color: var(--gray-600); margin-bottom: 1.5rem;">We couldn't find any products matching your search criteria.</p>
+                <a th:href="@{/products}" class="btn btn-primary">Browse All Products</a>
+            </div>
+
+            <!-- Product Grid -->
+            <div th:unless="${#lists.isEmpty(products)}" class="product-grid">
+                <div th:each="product : ${products}" class="product-card">
+                    <!-- Image and Badges -->
+                    <div class="card-img-wrap">
+                        <img th:src="${product.imageUrl}" th:alt="${product.name}" loading="lazy">
+                        <span class="card-badge-category" th:text="${product.category}">Category</span>
+                        <span class="card-badge-stock" 
+                              th:classappend="${product.outOfStock} ? 'stock-out' : 'stock-in'"
+                              th:text="${product.outOfStock} ? 'Out of Stock' : 'In Stock (' + ${product.stock} + ')'">
+                            Stock Status
+                        </span>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body">
+                        <h3 class="card-title" th:text="${product.name}">Product Name</h3>
+                        <p class="card-desc" th:text="${product.description}">Product description...</p>
+
+                        <div class="card-footer-info">
+                            <span class="card-price" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">₹999.00</span>
+                            <span class="card-stock-text" th:text="'Stock: ' + ${product.stock}">Stock: 10</span>
+                        </div>
+
+                        <!-- Card Action Buttons -->
+                        <div class="card-actions">
+                            <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline">
+                                View Details
+                            </a>
+                            <form th:action="@{/cart/add}" method="post" style="margin: 0;">
+                                <input type="hidden" name="productId" th:value="${product.id}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary btn-block" th:disabled="${product.outOfStock}">
+                                    <span th:if="${!product.outOfStock}">+ Add to Cart</span>
+                                    <span th:if="${product.outOfStock}">Out of Stock</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
