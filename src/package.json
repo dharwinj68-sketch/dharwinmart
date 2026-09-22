@@ -4,8 +4,5 @@
   "license": "MIT",
   "scripts": {
     "start": "mvn spring-boot:run"
-  },
-  "engines": {
-    "node": ">=14"
   }
 }
