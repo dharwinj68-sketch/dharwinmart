@@ -1,0 +1,13 @@
+target/
+.git/
+.gitignore
+*.bat
+*.ps1
+.mvn/
+mvnw
+mvnw.cmd
+data/
+.idea/
+.vscode/
+*.log
+README.md

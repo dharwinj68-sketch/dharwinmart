@@ -238,9 +238,37 @@ dharwinmart/
 │           ├── ProductServiceTest.java           # Product CRUD & search test
 │           ├── OrderServiceTest.java             # Order placement & stock deduction test
 │           └── CartCalculationTest.java          # Cart math & quantity tests
+├── Dockerfile                                    # Multi-stage production container build
+├── .dockerignore                                 # Optimized Docker build context
+├── render.yaml                                   # Render Blueprint configuration
 ├── pom.xml                                       # Maven build configuration
 └── README.md                                     # Project documentation
 ```
+
+---
+
+## 🐳 Docker & Cloud Deployment (Render)
+
+### Deploying to Render via Docker
+
+1. **Push your code to GitHub**:
+   ```bash
+   git add .
+   git commit -m "Add Docker and Render configuration"
+   git push origin main
+   ```
+
+2. **Deploy on [Render.com](https://render.com/)**:
+   - Go to your Render Dashboard and click **New +** -> **Web Service**.
+   - Select **Build and deploy from a Git repository** and connect your `dharwinmart` repository.
+   - Set the runtime environment to **Docker**.
+   - Select the **Free** instance type.
+   - Click **Create Web Service**.
+   - *(Alternative)*: Select **Blueprints** and Render will automatically detect `render.yaml`.
+
+3. **Environment Settings**:
+   - Render automatically injects the `PORT` variable (default `10000`).
+   - The application dynamically binds to `PORT` and initializes the database.
 
 ---
 
