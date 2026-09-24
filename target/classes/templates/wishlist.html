@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Breadcrumbs -->
+            <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--gray-600);">
+                <a th:href="@{/buyer/home}">Home</a> &gt; 
+                <span style="color: var(--dark); font-weight: 600;">My Wishlist</span>
+            </div>
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${infoMessage}" class="alert alert-info">
+                <span th:text="${infoMessage}">Info message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Page Title -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">❤️ My Saved Wishlist</h2>
+                    <p class="section-subtitle" th:text="${#lists.size(wishlist)} + ' item(s) saved in your personal wishlist'">0 items saved</p>
+                </div>
+                <div>
+                    <a th:href="@{/products}" class="btn btn-outline">Explore More Products →</a>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(wishlist)}" style="text-align: center; padding: 4.5rem 1rem; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">🤍</div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Your wishlist is currently empty</h3>
+                <p style="color: var(--gray-600); max-width: 420px; margin: 0 auto 1.75rem auto;">
+                    Save products you love so you can easily find them later, monitor prices, and add them to your cart with a single click.
+                </p>
+                <a th:href="@{/products}" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+                    Discover Products
+                </a>
+            </div>
+
+            <!-- Wishlist Items Grid / Table -->
+            <div th:unless="${#lists.isEmpty(wishlist)}" class="wishlist-grid">
+                <div th:each="item : ${wishlist}" class="wishlist-card" th:id="'wishlist-card-' + ${item.product.id}">
+                    <!-- Image -->
+                    <div class="wishlist-img-wrap">
+                        <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}" loading="lazy">
+                        <span class="card-badge-category" th:text="${item.product.category}">Category</span>
+                    </div>
+
+                    <!-- Details -->
+                    <div class="wishlist-body">
+                        <h3 class="wishlist-title">
+                            <a th:href="@{/products/{id}(id=${item.product.id})}" th:text="${item.product.name}" style="color: inherit;">Product Name</a>
+                        </h3>
+
+                        <!-- Seller Info -->
+                        <div class="wishlist-seller" style="font-size: 0.82rem; color: var(--gray-600); margin-top: 0.25rem;">
+                            <span>Sold by: </span>
+                            <strong th:text="${item.product.seller != null ? item.product.seller.fullName : 'DHARWINMART Official'}">Seller Name</strong>
+                        </div>
+
+                        <!-- Price and Stock -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin: 0.75rem 0;">
+                            <span class="card-price" th:text="'₹' + ${#numbers.formatDecimal(item.product.price, 1, 'COMMA', 2, 'POINT')}">₹999.00</span>
+                            <span class="card-badge-stock" 
+                                  th:classappend="${item.product.outOfStock} ? 'stock-out' : 'stock-in'"
+                                  th:text="${item.product.outOfStock} ? 'Out of Stock' : 'In Stock (' + ${item.product.stock} + ')'">
+                                In Stock
+                            </span>
+                        </div>
+
+                        <!-- Wishlist Status -->
+                        <div style="font-size: 0.8rem; color: var(--accent); margin-bottom: 1rem; font-weight: 600;">
+                            ✓ Saved in Wishlist
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="wishlist-actions">
+                            <!-- Add to Cart -->
+                            <form th:action="@{/cart/add}" method="post" style="margin: 0; flex: 1;">
+                                <input type="hidden" name="productId" th:value="${item.product.id}">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn btn-primary btn-block" style="padding: 0.55rem; font-size: 0.85rem;" th:disabled="${item.product.outOfStock}">
+                                    <span th:if="${!item.product.outOfStock}">🛒 Add to Cart</span>
+                                    <span th:if="${item.product.outOfStock}">Sold Out</span>
+                                </button>
+                            </form>
+
+                            <!-- View Product -->
+                            <a th:href="@{/products/{id}(id=${item.product.id})}" class="btn btn-outline" style="padding: 0.55rem 0.85rem; font-size: 0.85rem;" title="View Details">
+                                View
+                            </a>
+
+                            <!-- Remove Button -->
+                            <form th:action="@{/wishlist/remove}" method="post" style="margin: 0;">
+                                <input type="hidden" name="productId" th:value="${item.product.id}">
+                                <button type="submit" class="btn btn-danger-outline" style="padding: 0.55rem 0.75rem; font-size: 0.85rem;" title="Remove from wishlist">
+                                    🗑️
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

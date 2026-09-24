@@ -12,6 +12,14 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public String handleAccessDenied(AccessDeniedException ex, Model model) {
+        logger.warn("Access denied: {}", ex.getMessage());
+        model.addAttribute("errorTitle", "Access Denied (403)");
+        model.addAttribute("errorMessage", ex.getMessage());
+        return "access-denied";
+    }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public String handleResourceNotFound(ResourceNotFoundException ex, Model model) {
         logger.warn("Resource not found: {}", ex.getMessage());

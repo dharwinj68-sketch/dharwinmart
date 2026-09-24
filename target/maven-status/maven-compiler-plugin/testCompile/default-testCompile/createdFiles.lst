@@ -1,4 +1,8 @@
 com\dharwinmart\ProductServiceTest.class
+com\dharwinmart\SellerSecurityTest.class
+com\dharwinmart\RoleAuthorizationIntegrationTest.class
+com\dharwinmart\DharwinMartApplicationTests.class
+com\dharwinmart\WishlistTest.class
 com\dharwinmart\OrderServiceTest.class
 com\dharwinmart\CartCalculationTest.class
-com\dharwinmart\DharwinMartApplicationTests.class
+com\dharwinmart\UserAuthenticationTest.class

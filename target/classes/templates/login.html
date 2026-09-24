@@ -12,8 +12,8 @@
     <div th:replace="~{fragments/header :: navbar}"></div>
 
     <!-- Main Content -->
-    <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
-        <div class="container" style="max-width: 480px;">
+    <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 75vh; padding: 2rem 1rem;">
+        <div class="container" style="max-width: 500px;">
 
             <!-- Flash / Logout Alerts -->
             <div th:if="${logoutMessage}" class="alert alert-info">
@@ -30,29 +30,51 @@
             </div>
 
             <!-- Login Card -->
-            <div class="form-card" style="padding: 2.5rem 2rem; box-shadow: var(--shadow-lg);">
-                <div style="text-align: center; margin-bottom: 2rem;">
+            <div class="form-card" style="padding: 2.25rem 2rem; box-shadow: var(--shadow-lg);">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
                     <div class="brand-logo" style="justify-content: center; margin-bottom: 0.75rem;">
                         <span class="brand-badge">DM</span>
                         <span>DHARWINMART</span>
                     </div>
                     <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--dark);">Account Sign In</h2>
                     <p style="color: var(--gray-600); font-size: 0.88rem; margin-top: 0.25rem;">
-                        Log in to manage your orders or access the Admin portal
+                        Select your account type to access your personalized portal
                     </p>
                 </div>
 
+                <!-- Three Role Selection Tabs -->
+                <div class="login-role-tabs">
+                    <button type="button" class="role-tab" id="tabBuyer" 
+                            th:classappend="${selectedRole == 'BUYER'} ? 'active' : ''"
+                            onclick="selectRole('BUYER')">
+                        👤 Buyer
+                    </button>
+                    <button type="button" class="role-tab" id="tabSeller" 
+                            th:classappend="${selectedRole == 'SELLER'} ? 'active' : ''"
+                            onclick="selectRole('SELLER')">
+                        🏪 Seller
+                    </button>
+                    <button type="button" class="role-tab" id="tabAdmin" 
+                            th:classappend="${selectedRole == 'ADMIN'} ? 'active' : ''"
+                            onclick="selectRole('ADMIN')">
+                        ⚙️ Admin
+                    </button>
+                </div>
+
                 <!-- Quick Demo Login Presets -->
-                <div style="background-color: var(--gray-50); border: 1px dashed var(--gray-300); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1.5rem;">
-                    <span style="font-size: 0.78rem; font-weight: 700; color: var(--gray-600); text-transform: uppercase; display: block; margin-bottom: 0.5rem; text-align: center;">
-                        ⚡ Quick Demo One-Click Sign In
+                <div style="background-color: var(--gray-50); border: 1px dashed var(--gray-300); border-radius: var(--radius-md); padding: 0.85rem; margin-bottom: 1.5rem;">
+                    <span style="font-size: 0.76rem; font-weight: 700; color: var(--gray-600); text-transform: uppercase; display: block; margin-bottom: 0.5rem; text-align: center;">
+                        ⚡ One-Click Demo Credentials
                     </span>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                        <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.45rem;" onclick="fillCustomerDemo()">
-                            👤 Customer Demo
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.4rem;">
+                        <button type="button" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.4rem;" onclick="fillBuyerDemo()">
+                            👤 Buyer
                         </button>
-                        <button type="button" class="btn btn-outline" style="font-size: 0.82rem; padding: 0.45rem; border-color: var(--primary); color: var(--primary);" onclick="fillAdminDemo()">
-                            ⚙️ Admin Demo
+                        <button type="button" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.4rem; border-color: var(--secondary); color: var(--secondary);" onclick="fillSellerDemo()">
+                            🏪 Seller
+                        </button>
+                        <button type="button" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.4rem; border-color: var(--primary); color: var(--primary);" onclick="fillAdminDemo()">
+                            ⚙️ Admin
                         </button>
                     </div>
                 </div>
@@ -64,7 +86,7 @@
                     <div class="form-group">
                         <label class="form-label" for="username">Username or Email</label>
                         <input type="text" id="username" name="username" class="form-control" 
-                               placeholder="e.g. dharwin@example.com or admin" required>
+                               placeholder="Enter username or email address" required>
                     </div>
 
                     <div class="form-group">
@@ -73,15 +95,18 @@
                                placeholder="••••••••" required>
                     </div>
 
-                    <div style="margin-top: 1.75rem;">
-                        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 0.95rem;">
-                            Sign In to DHARWINMART →
+                    <div style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 0.95rem;" id="submitBtn">
+                            Sign In as <span id="submitRoleText" th:text="${selectedRole}">BUYER</span> →
                         </button>
                     </div>
                 </form>
 
-                <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--gray-500);">
-                    Academic Capstone MVP • Demo Credentials Pre-Loaded
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-200); font-size: 0.88rem;">
+                    <span style="color: var(--gray-600);">New to DHARWINMART?</span>
+                    <a th:href="@{/register}" style="color: var(--primary); font-weight: 700; margin-left: 0.35rem;">
+                        Create an Account
+                    </a>
                 </div>
             </div>
 
@@ -100,16 +125,35 @@
 
     <script th:src="@{/js/main.js}"></script>
     <script>
-        function fillCustomerDemo() {
-            document.getElementById('username').value = 'dharwin@example.com';
-            document.getElementById('password').value = 'customer123';
-            document.getElementById('loginRole').value = 'CUSTOMER';
+        function selectRole(role) {
+            document.getElementById('loginRole').value = role;
+            document.getElementById('submitRoleText').textContent = role;
+            
+            document.getElementById('tabBuyer').classList.remove('active');
+            document.getElementById('tabSeller').classList.remove('active');
+            document.getElementById('tabAdmin').classList.remove('active');
+
+            if (role === 'BUYER') document.getElementById('tabBuyer').classList.add('active');
+            if (role === 'SELLER') document.getElementById('tabSeller').classList.add('active');
+            if (role === 'ADMIN') document.getElementById('tabAdmin').classList.add('active');
+        }
+
+        function fillBuyerDemo() {
+            selectRole('BUYER');
+            document.getElementById('username').value = 'buyer1';
+            document.getElementById('password').value = 'buyer123';
+        }
+
+        function fillSellerDemo() {
+            selectRole('SELLER');
+            document.getElementById('username').value = 'techseller';
+            document.getElementById('password').value = 'seller123';
         }
 
         function fillAdminDemo() {
+            selectRole('ADMIN');
             document.getElementById('username').value = 'admin';
             document.getElementById('password').value = 'admin123';
-            document.getElementById('loginRole').value = 'ADMIN';
         }
     </script>
 </body>

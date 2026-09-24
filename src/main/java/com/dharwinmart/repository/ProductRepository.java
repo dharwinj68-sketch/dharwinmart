@@ -1,6 +1,7 @@
 package com.dharwinmart.repository;
 
 import com.dharwinmart.entity.Product;
+import com.dharwinmart.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,4 +23,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<String> findDistinctCategories();
 
     List<Product> findTop8ByOrderByIdAsc();
+
+    List<Product> findBySellerOrderByIdDesc(User seller);
+
+    List<Product> findBySellerIdOrderByIdDesc(Long sellerId);
+
+    long countBySeller(User seller);
+
+    long countBySellerId(Long sellerId);
+
+    List<Product> findByApprovalStatusIgnoreCase(String approvalStatus);
+
+    long countByApprovalStatusIgnoreCase(String approvalStatus);
 }

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buyer Dashboard - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Buyer Welcome Hero -->
+            <div style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%); color: var(--white); border-radius: var(--radius-lg); padding: 2.5rem 2rem; margin-bottom: 2rem; box-shadow: var(--shadow-md);">
+                <div style="max-width: 650px;">
+                    <span style="background: rgba(255, 255, 255, 0.2); font-size: 0.78rem; font-weight: 700; text-transform: uppercase; padding: 0.25rem 0.75rem; border-radius: var(--radius-full); display: inline-block; margin-bottom: 0.75rem;">
+                        👤 Buyer Experience
+                    </span>
+                    <h1 style="font-size: 1.85rem; font-weight: 800; line-height: 1.3; margin-bottom: 0.5rem;" 
+                        th:text="'Welcome back, ' + ${buyer.fullName} + '!'">Welcome back!</h1>
+                    <p style="color: #e0e7ff; font-size: 0.95rem; margin-bottom: 1.5rem;">
+                        Explore our campus product catalog, track your recent orders, and manage items in your wishlist.
+                    </p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                        <a th:href="@{/products}" class="btn" style="background-color: var(--white); color: var(--primary); font-weight: 700; padding: 0.65rem 1.35rem;">
+                            🛍️ Browse Products
+                        </a>
+                        <a th:href="@{/wishlist}" class="btn btn-outline" style="border-color: rgba(255,255,255,0.7); color: var(--white); padding: 0.65rem 1.35rem;">
+                            ❤️ View Wishlist (<span th:text="${wishlistCount}">0</span>)
+                        </a>
+                        <a th:href="@{/buyer/orders}" class="btn btn-outline" style="border-color: rgba(255,255,255,0.7); color: var(--white); padding: 0.65rem 1.35rem;">
+                            📦 My Orders (<span th:text="${totalOrders}">0</span>)
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Metrics Grid -->
+            <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 2.5rem;">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="${totalOrders}">0</div>
+                        <div class="stat-label">Orders Placed</div>
+                    </div>
+                    <div class="stat-icon">🛍️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" style="color: #e11d48;" th:text="${wishlistCount}">0</div>
+                        <div class="stat-label">Wishlist Items</div>
+                    </div>
+                    <div class="stat-icon">❤️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" style="color: var(--accent);" th:text="${cartItemCount}">0</div>
+                        <div class="stat-label">Items in Cart</div>
+                    </div>
+                    <div class="stat-icon">🛒</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" style="font-size: 1.25rem; font-weight: 700;" th:text="${buyer.phone != null ? buyer.phone : 'Not set'}">Phone</div>
+                        <div class="stat-label">Contact Profile</div>
+                    </div>
+                    <div class="stat-icon">📱</div>
+                </div>
+            </div>
+
+            <!-- Saved Wishlist Preview -->
+            <div class="section-header">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark);">Your Saved Wishlist</h3>
+                    <p class="section-subtitle">Items you've bookmarked to purchase later</p>
+                </div>
+                <a th:href="@{/wishlist}" class="btn btn-outline">Full Wishlist →</a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(wishlistItems)}" style="background: var(--white); padding: 2.5rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); margin-bottom: 2.5rem;">
+                <p style="color: var(--gray-500); margin-bottom: 1rem;">No products saved in your wishlist yet.</p>
+                <a th:href="@{/products}" class="btn btn-outline" style="font-size: 0.85rem;">Discover Items to Save</a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(wishlistItems)}" class="wishlist-grid" style="margin-bottom: 2.5rem;">
+                <div th:each="item : ${wishlistItems}" class="wishlist-card">
+                    <div class="wishlist-img-wrap">
+                        <img th:src="${item.product.imageUrl}" th:alt="${item.product.name}" loading="lazy">
+                        <span class="card-badge-category" th:text="${item.product.category}">Category</span>
+                    </div>
+                    <div class="wishlist-body">
+                        <h4 class="wishlist-title" style="font-size: 0.95rem;">
+                            <a th:href="@{/products/{id}(id=${item.product.id})}" th:text="${item.product.name}" style="color: inherit;">Name</a>
+                        </h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                            <span class="card-price" th:text="'₹' + ${#numbers.formatDecimal(item.product.price, 1, 'COMMA', 2, 'POINT')}">₹999</span>
+                            <a th:href="@{/products/{id}(id=${item.product.id})}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders Preview -->
+            <div class="section-header">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark);">Recent Orders</h3>
+                    <p class="section-subtitle">Track your delivery statuses and past invoices</p>
+                </div>
+                <a th:href="@{/buyer/orders}" class="btn btn-outline">All Past Orders →</a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(recentOrders)}" style="background: var(--white); padding: 2.5rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200); margin-bottom: 2.5rem;">
+                <p style="color: var(--gray-500); margin-bottom: 1rem;">You haven't placed any orders yet.</p>
+                <a th:href="@{/products}" class="btn btn-primary" style="font-size: 0.85rem;">Start Shopping</a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(recentOrders)}" class="data-table-wrap" style="margin-bottom: 2.5rem;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order Reference</th>
+                            <th>Date</th>
+                            <th>Items Count</th>
+                            <th>Grand Total</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${recentOrders}">
+                            <td style="font-weight: 700; color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600);" 
+                                th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</td>
+                            <td th:text="${#lists.size(order.items)} + ' item(s)'">2 item(s)</td>
+                            <td style="font-weight: 700; color: var(--dark);" 
+                                th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹1,999.00</td>
+                            <td>
+                                <span class="badge-stock stock-in" th:text="${order.status}">PLACED</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a th:href="@{/order-confirmation/{id}(id=${order.id})}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                    View Receipt
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

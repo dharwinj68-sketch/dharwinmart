@@ -1,7 +1,11 @@
 package com.dharwinmart.config;
 
 import com.dharwinmart.entity.Product;
+import com.dharwinmart.entity.User;
+import com.dharwinmart.entity.Wishlist;
 import com.dharwinmart.repository.ProductRepository;
+import com.dharwinmart.repository.UserRepository;
+import com.dharwinmart.repository.WishlistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -16,15 +20,48 @@ public class DataInitializer implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(DataInitializer.class);
     private final ProductRepository productRepository;
+    private final UserRepository userRepository;
+    private final WishlistRepository wishlistRepository;
 
-    public DataInitializer(ProductRepository productRepository) {
+    public DataInitializer(ProductRepository productRepository,
+                           UserRepository userRepository,
+                           WishlistRepository wishlistRepository) {
         this.productRepository = productRepository;
+        this.userRepository = userRepository;
+        this.wishlistRepository = wishlistRepository;
     }
 
     @Override
     public void run(String... args) {
+        // 1. Seed Users (Admin, 2 Sellers, 2 Buyers)
+        User admin = null;
+        User techSeller = null;
+        User styleSeller = null;
+        User buyer1 = null;
+        User buyer2 = null;
+
+        if (userRepository.count() == 0) {
+            logger.info("Database users empty. Seeding initial Admin, Sellers, and Buyers...");
+
+            admin = new User("admin", "admin123", "admin@dharwinmart.com", "System Administrator", "ADMIN");
+            techSeller = new User("techseller", "seller123", "techseller@dharwinmart.com", "Apex Tech Solutions", "SELLER", "9876500001", "Technology Park, Suite 402");
+            styleSeller = new User("styleseller", "seller123", "styleseller@dharwinmart.com", "Campus Trendz & Living", "SELLER", "9876500002", "Fashion Street, Shop 18");
+            buyer1 = new User("buyer1", "buyer123", "dharwin@example.com", "Dharwin J", "BUYER", "9876543210", "Hostel Block B, Room 204, Campus");
+            buyer2 = new User("buyer2", "buyer123", "anita@example.com", "Anita Sharma", "BUYER", "9123456780", "Staff Quarters 12, West Campus");
+
+            userRepository.saveAll(Arrays.asList(admin, techSeller, styleSeller, buyer1, buyer2));
+            logger.info("Successfully seeded 5 initial user accounts!");
+        } else {
+            admin = userRepository.findByUsernameIgnoreCase("admin").orElse(null);
+            techSeller = userRepository.findByUsernameIgnoreCase("techseller").orElse(null);
+            styleSeller = userRepository.findByUsernameIgnoreCase("styleseller").orElse(null);
+            buyer1 = userRepository.findByUsernameIgnoreCase("buyer1").orElse(null);
+            buyer2 = userRepository.findByUsernameIgnoreCase("buyer2").orElse(null);
+        }
+
+        // 2. Seed Products
         if (productRepository.count() == 0) {
-            logger.info("Database is empty. Seeding initial products for DHARWINMART...");
+            logger.info("Database products empty. Seeding catalog products...");
 
             List<Product> sampleProducts = Arrays.asList(
                 new Product(
@@ -33,7 +70,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("84999.00"),
                     "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=600&auto=format&fit=crop&q=80",
                     "Electronics",
-                    15
+                    15,
+                    techSeller
                 ),
                 new Product(
                     "Smartphone Galaxy Pro 5G",
@@ -41,7 +79,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("42999.00"),
                     "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=600&auto=format&fit=crop&q=80",
                     "Electronics",
-                    22
+                    22,
+                    techSeller
                 ),
                 new Product(
                     "Wireless ANC Headphones",
@@ -49,7 +88,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("6999.00"),
                     "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80",
                     "Electronics",
-                    30
+                    30,
+                    techSeller
                 ),
                 new Product(
                     "Smart Fitness Watch V2",
@@ -57,7 +97,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("3499.00"),
                     "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
                     "Electronics",
-                    25
+                    25,
+                    techSeller
                 ),
                 new Product(
                     "Tablet Ultra 11-inch",
@@ -65,7 +106,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("28999.00"),
                     "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&auto=format&fit=crop&q=80",
                     "Electronics",
-                    12
+                    12,
+                    techSeller
                 ),
                 new Product(
                     "Mechanical RGB Gaming Keyboard",
@@ -73,7 +115,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("3899.00"),
                     "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80",
                     "Accessories",
-                    18
+                    18,
+                    techSeller
                 ),
                 new Product(
                     "Ergonomic Wireless Mouse",
@@ -81,7 +124,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("1499.00"),
                     "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&auto=format&fit=crop&q=80",
                     "Accessories",
-                    40
+                    40,
+                    techSeller
                 ),
                 new Product(
                     "Water-Resistant Everyday Backpack",
@@ -89,7 +133,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("2199.00"),
                     "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&auto=format&fit=crop&q=80",
                     "Accessories",
-                    20
+                    20,
+                    styleSeller
                 ),
                 new Product(
                     "Pro Performance Running Shoes",
@@ -97,7 +142,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("2999.00"),
                     "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80",
                     "Fashion",
-                    28
+                    28,
+                    styleSeller
                 ),
                 new Product(
                     "Classic Organic Cotton T-Shirt",
@@ -105,7 +151,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("799.00"),
                     "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=600&auto=format&fit=crop&q=80",
                     "Fashion",
-                    50
+                    50,
+                    styleSeller
                 ),
                 new Product(
                     "Modern Java Programming Guide",
@@ -113,7 +160,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("1299.00"),
                     "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
                     "Books",
-                    35
+                    35,
+                    styleSeller
                 ),
                 new Product(
                     "Minimalist LED Desk Lamp",
@@ -121,7 +169,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("1899.00"),
                     "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=600&auto=format&fit=crop&q=80",
                     "Home",
-                    16
+                    16,
+                    styleSeller
                 ),
                 new Product(
                     "Stainless Steel Insulated Bottle",
@@ -129,7 +178,8 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("999.00"),
                     "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&auto=format&fit=crop&q=80",
                     "Home",
-                    45
+                    45,
+                    styleSeller
                 ),
                 new Product(
                     "Out of Stock Demo Item",
@@ -137,14 +187,45 @@ public class DataInitializer implements CommandLineRunner {
                     new BigDecimal("499.00"),
                     "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=600&auto=format&fit=crop&q=80",
                     "Accessories",
-                    0
+                    0,
+                    techSeller
                 )
             );
 
             productRepository.saveAll(sampleProducts);
-            logger.info("Successfully seeded {} products into DHARWINMART!", sampleProducts.size());
+            logger.info("Successfully seeded {} products with seller associations!", sampleProducts.size());
         } else {
-            logger.info("Database already contains {} products. Skipping seed.", productRepository.count());
+            // Ensure existing products have seller associations if missing
+            List<Product> existingProducts = productRepository.findAll();
+            boolean updated = false;
+            for (Product p : existingProducts) {
+                if (p.getSeller() == null && techSeller != null && styleSeller != null) {
+                    if ("Fashion".equalsIgnoreCase(p.getCategory()) || "Home".equalsIgnoreCase(p.getCategory()) || "Books".equalsIgnoreCase(p.getCategory())) {
+                        p.setSeller(styleSeller);
+                    } else {
+                        p.setSeller(techSeller);
+                    }
+                    if (p.getApprovalStatus() == null) {
+                        p.setApprovalStatus("APPROVED");
+                    }
+                    updated = true;
+                }
+            }
+            if (updated) {
+                productRepository.saveAll(existingProducts);
+                logger.info("Associated existing products with sellers.");
+            }
+        }
+
+        // 3. Seed sample wishlist for buyer1 if empty
+        if (buyer1 != null && wishlistRepository.countByUserId(buyer1.getId()) == 0) {
+            List<Product> products = productRepository.findAll();
+            if (products.size() >= 3) {
+                Wishlist w1 = new Wishlist(buyer1, products.get(0));
+                Wishlist w2 = new Wishlist(buyer1, products.get(2));
+                wishlistRepository.saveAll(Arrays.asList(w1, w2));
+                logger.info("Seeded initial wishlist items for demo buyer1.");
+            }
         }
     }
 }

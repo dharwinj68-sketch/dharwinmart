@@ -42,7 +42,15 @@ public class Product {
     @Column(nullable = false)
     private Integer stock;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    private User seller;
+
+    @Column(name = "approval_status")
+    private String approvalStatus = "APPROVED"; // "APPROVED", "PENDING_APPROVAL", "REJECTED"
+
     public Product() {
+        this.approvalStatus = "APPROVED";
     }
 
     public Product(String name, String description, BigDecimal price, String imageUrl, String category, Integer stock) {
@@ -52,6 +60,13 @@ public class Product {
         this.imageUrl = imageUrl;
         this.category = category;
         this.stock = stock;
+        this.approvalStatus = "APPROVED";
+    }
+
+    public Product(String name, String description, BigDecimal price, String imageUrl, String category, Integer stock, User seller) {
+        this(name, description, price, imageUrl, category, stock);
+        this.seller = seller;
+        this.approvalStatus = "APPROVED";
     }
 
     // Getters and Setters
@@ -114,5 +129,25 @@ public class Product {
 
     public boolean isOutOfStock() {
         return this.stock == null || this.stock <= 0;
+    }
+
+    public User getSeller() {
+        return seller;
+    }
+
+    public void setSeller(User seller) {
+        this.seller = seller;
+    }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public boolean isApproved() {
+        return "APPROVED".equalsIgnoreCase(this.approvalStatus);
     }
 }

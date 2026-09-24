@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Breadcrumbs -->
+            <div style="margin-bottom: 1.5rem; font-size: 0.9rem; color: var(--gray-600);">
+                <a th:href="@{/buyer/home}">Home</a> &gt; 
+                <span style="color: var(--dark); font-weight: 600;">My Orders</span>
+            </div>
+
+            <!-- Page Header -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📦 My Orders History</h2>
+                    <p class="section-subtitle">Track your order statuses, inspect item details, and download invoices</p>
+                </div>
+                <div>
+                    <a th:href="@{/products}" class="btn btn-primary">+ Shop More Products</a>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(orders)}" style="text-align: center; padding: 4.5rem 1rem; background: var(--white); border-radius: var(--radius-lg); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm);">
+                <div style="font-size: 3.5rem; margin-bottom: 1rem;">🛍️</div>
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">No orders placed yet</h3>
+                <p style="color: var(--gray-600); max-width: 420px; margin: 0 auto 1.75rem auto;">
+                    Looks like you haven't bought anything yet. Explore our student catalog and grab the best campus deals!
+                </p>
+                <a th:href="@{/products}" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+                    Browse Catalog
+                </a>
+            </div>
+
+            <!-- Orders Table -->
+            <div th:unless="${#lists.isEmpty(orders)}" class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date & Time</th>
+                            <th>Delivery Address</th>
+                            <th>Item Details</th>
+                            <th>Total Amount</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Invoice</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td style="font-weight: 700; color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600);" 
+                                th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600); max-width: 200px;" th:text="${order.address}">Address</td>
+                            <td>
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                                    <li th:each="item : ${order.items}" style="margin-bottom: 0.2rem;">
+                                        <span style="font-weight: 600;" th:text="${item.product.name}">Product</span>
+                                        <span style="color: var(--gray-500);" th:text="' × ' + ${item.quantity}"> × 1</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td style="font-weight: 700; color: var(--dark);" 
+                                th:text="'₹' + ${#numbers.formatDecimal(order.totalAmount, 1, 'COMMA', 2, 'POINT')}">₹1,999.00</td>
+                            <td>
+                                <span class="badge-stock stock-in" th:text="${order.status}">PLACED</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a th:href="@{/order-confirmation/{id}(id=${order.id})}" class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.8rem;">
+                                    View Receipt →
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - DHARWINMART Admin</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Page Header -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">👥 User Management</h2>
+                    <p class="section-subtitle">Manage accounts, inspect roles, and enable/disable portal access</p>
+                </div>
+                <div>
+                    <a th:href="@{/admin/dashboard}" class="btn btn-outline">← Back to Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Role Filter Pills -->
+            <div class="category-scroll" style="margin-bottom: 1.5rem;">
+                <a th:href="@{/admin/users(role='ALL')}" class="cat-pill" 
+                   th:classappend="${selectedRole == 'ALL' or selectedRole == null} ? 'active' : ''">
+                    All Users (<span th:text="${totalUsers}">0</span>)
+                </a>
+                <a th:href="@{/admin/users(role='BUYER')}" class="cat-pill" 
+                   th:classappend="${selectedRole == 'BUYER'} ? 'active' : ''">
+                    Buyers (<span th:text="${totalBuyers}">0</span>)
+                </a>
+                <a th:href="@{/admin/users(role='SELLER')}" class="cat-pill" 
+                   th:classappend="${selectedRole == 'SELLER'} ? 'active' : ''">
+                    Sellers (<span th:text="${totalSellers}">0</span>)
+                </a>
+                <a th:href="@{/admin/users(role='ADMIN')}" class="cat-pill" 
+                   th:classappend="${selectedRole == 'ADMIN'} ? 'active' : ''">
+                    Admins (<span th:text="${totalAdmins}">0</span>)
+                </a>
+            </div>
+
+            <!-- Users Table -->
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Full Name / Store</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Registered</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(users)}">
+                            <td colspan="8" style="text-align: center; padding: 2.5rem; color: var(--gray-500);">
+                                No users found for the selected filter.
+                            </td>
+                        </tr>
+                        <tr th:each="u : ${users}">
+                            <td style="font-weight: 700; color: var(--gray-700);" th:text="'#' + ${u.id}">#1</td>
+                            <td style="font-weight: 600;" th:text="${u.fullName}">Dharwin J</td>
+                            <td th:text="${u.username}">dharwin</td>
+                            <td th:text="${u.email}">dharwin@example.com</td>
+                            <td>
+                                <span class="badge-role" 
+                                      th:classappend="'badge-role-' + ${#strings.toLowerCase(u.role)}" 
+                                      th:text="${u.role}">BUYER</span>
+                            </td>
+                            <td>
+                                <span th:if="${u.enabled}" class="badge-status-active">Active</span>
+                                <span th:unless="${u.enabled}" class="badge-status-disabled">Disabled</span>
+                            </td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600);" 
+                                th:text="${#temporals.format(u.createdAt, 'dd MMM yyyy')}">23 Sep 2026</td>
+                            <td style="text-align: right;">
+                                <form th:action="@{/admin/users/{id}/toggle-status(id=${u.id})}" method="post" style="display: inline;"
+                                      onsubmit="return confirmAction(event, 'Are you sure you want to change the status of this account?');">
+                                    <input type="hidden" name="filterRole" th:value="${selectedRole}">
+                                    <button type="submit" 
+                                            class="btn" 
+                                            th:classappend="${u.enabled} ? 'btn-danger-outline' : 'btn-outline'"
+                                            style="padding: 0.35rem 0.75rem; font-size: 0.8rem;"
+                                            th:disabled="${u.username == session.currentUser}">
+                                        <span th:if="${u.enabled}">Disable</span>
+                                        <span th:unless="${u.enabled}">Activate</span>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -38,6 +38,10 @@ public class Order {
     @Column(nullable = false)
     private String status; // e.g. "PLACED"
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -56,9 +60,22 @@ public class Order {
         this.status = "PLACED";
     }
 
+    public Order(String customerName, String email, String phone, String address, BigDecimal totalAmount, User user) {
+        this(customerName, email, phone, address, totalAmount);
+        this.user = user;
+    }
+
     public void addItem(OrderItem item) {
         items.add(item);
         item.setOrder(this);
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     // Getters and Setters

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Products - DHARWINMART Seller</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Page Header -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">📦 My Listed Products</h2>
+                    <p class="section-subtitle">Manage your inventory, update pricing, restock items, and check approval status</p>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a th:href="@{/seller/dashboard}" class="btn btn-outline">← Dashboard</a>
+                    <a th:href="@{/seller/products/new}" class="btn btn-primary">+ Add New Product</a>
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">ID</th>
+                            <th style="width: 70px;">Image</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Listing Status</th>
+                            <th style="text-align: right; width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(products)}">
+                            <td colspan="8" style="text-align: center; padding: 3.5rem; color: var(--gray-500);">
+                                You haven't added any products yet. Click "+ Add New Product" to list your first item!
+                            </td>
+                        </tr>
+                        <tr th:each="product : ${products}">
+                            <td th:text="${product.id}">1</td>
+                            <td>
+                                <img th:src="${product.imageUrl}" th:alt="${product.name}" 
+                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: var(--radius-sm); background: var(--gray-100);">
+                            </td>
+                            <td>
+                                <strong th:text="${product.name}" style="color: var(--dark); display: block;">Name</strong>
+                                <span style="font-size: 0.78rem; color: var(--gray-500); max-width: 280px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                      th:text="${product.description}">Description</span>
+                            </td>
+                            <td>
+                                <span class="card-badge-category" style="position: static; font-size: 0.75rem;" th:text="${product.category}">Category</span>
+                            </td>
+                            <td style="font-weight: 700; color: var(--dark);" th:text="'₹' + ${#numbers.formatDecimal(product.price, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                            <td>
+                                <span th:if="${product.stock > 0}" style="color: var(--accent-hover); font-weight: 700;" th:text="${product.stock}">10</span>
+                                <span th:if="${product.stock <= 0}" style="color: var(--danger); font-weight: 700;">0 (Out of Stock)</span>
+                            </td>
+                            <td>
+                                <span th:if="${product.approvalStatus == 'APPROVED' or product.approvalStatus == null}" class="badge-status-active">Active</span>
+                                <span th:if="${product.approvalStatus == 'PENDING_APPROVAL'}" style="background-color: var(--warning-light); color: var(--warning); padding: 0.2rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;">Pending Review</span>
+                                <span th:if="${product.approvalStatus == 'REJECTED'}" class="badge-status-disabled">Rejected</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <div style="display: inline-flex; gap: 0.4rem;">
+                                    <a th:href="@{/seller/products/edit/{id}(id=${product.id})}" class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+                                        ✏️ Edit
+                                    </a>
+                                    <form th:action="@{/seller/products/delete/{id}(id=${product.id})}" method="post" style="margin: 0;"
+                                          onsubmit="return confirmAction(event, 'Are you sure you want to remove this product listing?');">
+                                        <button type="submit" class="btn btn-danger-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+                                            🗑️ Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access Denied (403) - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 70vh;">
+        <div class="container" style="max-width: 600px;">
+
+            <div class="form-card" style="text-align: center; padding: 3.5rem 2rem; box-shadow: var(--shadow-md);">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">⛔</div>
+                
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--dark); margin-bottom: 0.75rem;">
+                    Access Restricted (403)
+                </h1>
+                
+                <p style="color: var(--gray-600); font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
+                    You do not have the required permissions to view this resource.
+                    <span th:if="${userRole != null}">
+                        You are currently signed in as a <strong th:text="${userRole}">BUYER</strong>.
+                    </span>
+                </p>
+
+                <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                    <a th:if="${userRole == 'ADMIN'}" th:href="@{/admin/dashboard}" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+                        Go to Admin Dashboard
+                    </a>
+                    <a th:if="${userRole == 'SELLER'}" th:href="@{/seller/dashboard}" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+                        Go to Seller Dashboard
+                    </a>
+                    <a th:if="${userRole == 'BUYER'}" th:href="@{/buyer/home}" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+                        Go to Buyer Home
+                    </a>
+                    <a th:if="${userRole == null}" th:href="@{/login}" class="btn btn-primary" style="padding: 0.75rem 1.75rem;">
+                        Sign In with Different Account
+                    </a>
+                    <a th:href="@{/}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+                        Storefront Home
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

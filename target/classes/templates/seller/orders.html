@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Orders - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🛍️ Customer Orders for Your Products</h2>
+                    <p class="section-subtitle">Real-time orders placed by buyers containing items from your store</p>
+                </div>
+                <div>
+                    <a th:href="@{/seller/dashboard}" class="btn btn-outline">← Back to Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(orders)}" style="background: var(--white); padding: 3.5rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                <div style="font-size: 3rem; margin-bottom: 0.75rem;">🛍️</div>
+                <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">No orders yet</h4>
+                <p style="color: var(--gray-600);">When customers buy your products, order details will appear here.</p>
+            </div>
+
+            <!-- Orders Table -->
+            <div th:unless="${#lists.isEmpty(orders)}" class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Email</th>
+                            <th>Destination</th>
+                            <th>Date</th>
+                            <th>Your Items in Order</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${orders}">
+                            <td style="font-weight: 700; color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</td>
+                            <td style="font-weight: 600;" th:text="${order.customerName}">Customer</td>
+                            <td th:text="${order.email}">email@example.com</td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600); max-width: 220px;" th:text="${order.address}">Address</td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600);" 
+                                th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</td>
+                            <td>
+                                <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.85rem;">
+                                    <li th:each="item : ${order.items}" 
+                                        th:if="${item.product != null and item.product.seller != null and item.product.seller.id == currentSellerId}"
+                                        style="margin-bottom: 0.25rem;">
+                                        <span style="font-weight: 600;" th:text="${item.product.name}">Product</span>
+                                        <span style="color: var(--gray-500);" th:text="' × ' + ${item.quantity}"> × 1</span>
+                                        <span style="color: var(--dark); font-weight: 700;" th:text="' (₹' + ${#numbers.formatDecimal(item.subtotal, 1, 'COMMA', 2, 'POINT')} + ')'"> (₹999)</span>
+                                    </li>
+                                </ul>
+                            </td>
+                            <td>
+                                <span class="badge-stock stock-in" th:text="${order.status}">PLACED</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

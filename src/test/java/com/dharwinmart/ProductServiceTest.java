@@ -63,10 +63,30 @@ class ProductServiceTest {
         assertTrue(accessories.stream().allMatch(p -> "Accessories".equalsIgnoreCase(p.getCategory())));
     }
 
+    @Autowired
+    private com.dharwinmart.service.WishlistService wishlistService;
+
+    @Autowired
+    private com.dharwinmart.service.UserService userService;
+
     @Test
     void testDeleteProduct() {
         Long id = testProduct.getId();
         productService.deleteProduct(id);
         assertThrows(RuntimeException.class, () -> productService.getProductById(id));
+    }
+
+    @Test
+    void testDeleteProductCleansUpWishlist() {
+        com.dharwinmart.entity.User buyer = userService.registerUser("wishbuyer_" + System.currentTimeMillis(), "pass123",
+                "wishbuyer_" + System.currentTimeMillis() + "@test.com", "Wish Buyer", "BUYER", "", "");
+        wishlistService.addToWishlist(buyer.getId(), testProduct.getId());
+        assertTrue(wishlistService.isWishlisted(buyer.getId(), testProduct.getId()));
+
+        // Delete product
+        productService.deleteProduct(testProduct.getId());
+
+        // Wishlist item should be cleanly deleted
+        assertFalse(wishlistService.isWishlisted(buyer.getId(), testProduct.getId()));
     }
 }

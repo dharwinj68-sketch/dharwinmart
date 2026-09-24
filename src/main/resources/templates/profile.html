@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" style="padding: 2.5rem 1rem;">
+        <div class="container" style="max-width: 620px;">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">👤 Account Profile</h2>
+                    <p class="section-subtitle">View and update your personal details and contact preferences</p>
+                </div>
+                <span class="user-role-pill" th:classappend="'role-' + ${#strings.toLowerCase(user.role)}" 
+                      style="font-size: 0.85rem; padding: 0.35rem 0.85rem;" th:text="${user.role}">ROLE</span>
+            </div>
+
+            <div class="form-card" style="box-shadow: var(--shadow-md);">
+                <form th:action="@{/profile}" method="post">
+                    <!-- Readonly Username & Email -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem;">
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label" style="color: var(--gray-600);">Username</label>
+                            <input type="text" th:value="${user.username}" class="form-control" readonly style="background-color: var(--gray-100);">
+                        </div>
+                        <div class="form-group" style="margin: 0;">
+                            <label class="form-label" style="color: var(--gray-600);">Email Address</label>
+                            <input type="email" th:value="${user.email}" class="form-control" readonly style="background-color: var(--gray-100);">
+                        </div>
+                    </div>
+
+                    <!-- Editable Fields -->
+                    <div class="form-group">
+                        <label class="form-label" for="fullName">Full Name / Store Name *</label>
+                        <input type="text" id="fullName" name="fullName" th:value="${user.fullName}" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Contact Phone Number</label>
+                        <input type="tel" id="phone" name="phone" th:value="${user.phone}" class="form-control" placeholder="e.g. 9876543210">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="address">Delivery / Store Address</label>
+                        <textarea id="address" name="address" rows="3" class="form-control" 
+                                  th:text="${user.address}" placeholder="Enter delivery or business address..."></textarea>
+                    </div>
+
+                    <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+                        <button type="submit" class="btn btn-primary" style="padding: 0.75rem 2rem;">
+                            Save Profile Changes
+                        </button>
+                        <a th:href="${user.role == 'ADMIN' ? '/admin/dashboard' : (user.role == 'SELLER' ? '/seller/dashboard' : '/buyer/home')}" 
+                           class="btn btn-outline" style="padding: 0.75rem 1.5rem;">
+                            Return to Dashboard
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

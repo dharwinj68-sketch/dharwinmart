@@ -64,6 +64,12 @@
                         </span>
                     </div>
 
+                    <!-- Seller Info -->
+                    <div class="detail-meta-item" th:if="${product.seller != null}">
+                        <strong style="font-size: 0.9rem; color: var(--gray-700);">Seller:</strong>
+                        <span style="font-size: 0.95rem; font-weight: 600; color: var(--primary);" th:text="${product.seller.fullName}">Seller Name</span>
+                    </div>
+
                     <!-- Add to Cart Form with Quantity Selector -->
                     <form th:action="@{/cart/add}" method="post" style="margin-top: 1rem;">
                         <input type="hidden" name="productId" th:value="${product.id}">
@@ -77,11 +83,21 @@
                             </div>
                         </div>
 
-                        <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                        <div style="margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center;">
                             <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem; font-size: 1rem;" th:disabled="${product.outOfStock}">
                                 <span th:if="${!product.outOfStock}">🛒 Add to Cart</span>
                                 <span th:if="${product.outOfStock}">Out of Stock</span>
                             </button>
+
+                            <!-- Wishlist Toggle Button -->
+                            <button type="button" class="btn-wishlist-toggle" style="padding: 0.8rem 1.5rem; font-size: 0.95rem;"
+                                    th:classappend="${wishlistProductIds != null and wishlistProductIds.contains(product.id)} ? 'active' : ''"
+                                    th:data-product-id="${product.id}"
+                                    onclick="handleWishlistToggle(this)">
+                                <span class="heart-icon" th:text="${wishlistProductIds != null and wishlistProductIds.contains(product.id)} ? '♥' : '♡'">♡</span>
+                                <span class="wishlist-text" th:text="${wishlistProductIds != null and wishlistProductIds.contains(product.id)} ? 'Wishlisted' : 'Add to Wishlist'">Add to Wishlist</span>
+                            </button>
+
                             <a th:href="@{/products}" class="btn btn-secondary" style="padding: 0.8rem 1.5rem;">
                                 ← Continue Browsing
                             </a>

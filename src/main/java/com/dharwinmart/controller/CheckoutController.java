@@ -3,9 +3,11 @@ package com.dharwinmart.controller;
 import com.dharwinmart.dto.Cart;
 import com.dharwinmart.dto.CheckoutForm;
 import com.dharwinmart.entity.Order;
+import com.dharwinmart.entity.User;
 import com.dharwinmart.exception.InsufficientStockException;
 import com.dharwinmart.service.CartService;
 import com.dharwinmart.service.OrderService;
+import com.dharwinmart.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -19,10 +21,12 @@ public class CheckoutController {
 
     private final CartService cartService;
     private final OrderService orderService;
+    private final UserService userService;
 
-    public CheckoutController(CartService cartService, OrderService orderService) {
+    public CheckoutController(CartService cartService, OrderService orderService, UserService userService) {
         this.cartService = cartService;
         this.orderService = orderService;
+        this.userService = userService;
     }
 
     @GetMapping("/checkout")
@@ -33,7 +37,19 @@ public class CheckoutController {
             return "redirect:/cart";
         }
         if (!model.containsAttribute("checkoutForm")) {
-            model.addAttribute("checkoutForm", new CheckoutForm());
+            CheckoutForm form = new CheckoutForm();
+            Long userId = (Long) session.getAttribute(LoginController.SESSION_USER_ID_KEY);
+            if (userId != null) {
+                try {
+                    User user = userService.getUserById(userId);
+                    form.setCustomerName(user.getFullName());
+                    form.setEmail(user.getEmail());
+                    if (user.getPhone() != null) form.setPhone(user.getPhone());
+                    if (user.getAddress() != null) form.setAddress(user.getAddress());
+                } catch (Exception ignored) {
+                }
+            }
+            model.addAttribute("checkoutForm", form);
         }
         model.addAttribute("cart", cart);
         return "checkout";
@@ -41,10 +57,10 @@ public class CheckoutController {
 
     @PostMapping("/checkout")
     public String processCheckout(@Valid @ModelAttribute("checkoutForm") CheckoutForm checkoutForm,
-                                  BindingResult bindingResult,
-                                  HttpSession session,
-                                  Model model,
-                                  RedirectAttributes redirectAttributes) {
+                                   BindingResult bindingResult,
+                                   HttpSession session,
+                                   Model model,
+                                   RedirectAttributes redirectAttributes) {
         Cart cart = cartService.getCart(session);
         if (cart == null || cart.isEmpty()) {
             redirectAttributes.addFlashAttribute("errorMessage", "Your cart is empty. Cannot place an order.");
@@ -57,7 +73,16 @@ public class CheckoutController {
         }
 
         try {
-            Order order = orderService.placeOrder(cart, checkoutForm);
+            Long userId = (Long) session.getAttribute(LoginController.SESSION_USER_ID_KEY);
+            User user = null;
+            if (userId != null) {
+                try {
+                    user = userService.getUserById(userId);
+                } catch (Exception ignored) {
+                }
+            }
+
+            Order order = orderService.placeOrder(cart, checkoutForm, user);
             // Clear cart upon successful order
             cartService.clearCart(session);
             redirectAttributes.addFlashAttribute("successMessage", "Order placed successfully!");

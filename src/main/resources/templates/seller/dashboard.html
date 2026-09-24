@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+
+            <!-- Flash Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Dashboard Title & Actions -->
+            <div class="section-header">
+                <div>
+                    <h2 class="section-title">🏪 Seller Business Hub</h2>
+                    <p class="section-subtitle">Manage your product catalog, monitor inventory levels, and fulfill orders</p>
+                </div>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a th:href="@{/seller/products/new}" class="btn btn-primary">+ Add New Product</a>
+                    <a th:href="@{/seller/products}" class="btn btn-outline">My Catalog</a>
+                    <a th:href="@{/seller/orders}" class="btn btn-secondary">Incoming Orders</a>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards -->
+            <div class="admin-stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="${totalProducts}">0</div>
+                        <div class="stat-label">Listed Products</div>
+                    </div>
+                    <div class="stat-icon">📦</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="${totalOrders}">0</div>
+                        <div class="stat-label">Orders Received</div>
+                    </div>
+                    <div class="stat-icon">🛍️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" th:text="'₹' + ${#numbers.formatDecimal(sellerRevenue, 1, 'COMMA', 2, 'POINT')}">₹0.00</div>
+                        <div class="stat-label">Seller Earnings</div>
+                    </div>
+                    <div class="stat-icon">💰</div>
+                </div>
+
+                <div class="stat-card">
+                    <div>
+                        <div class="stat-val" style="color: var(--danger);" th:text="${outOfStockCount}">0</div>
+                        <div class="stat-label">Out of Stock Alerts</div>
+                    </div>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+            </div>
+
+            <!-- My Products Preview -->
+            <div class="section-header" style="margin-top: 2.5rem;">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark);">My Product Listings</h3>
+                    <p class="section-subtitle">Your products currently active on DHARWINMART</p>
+                </div>
+                <a th:href="@{/seller/products}" class="btn btn-outline">View All Listings →</a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(products)}" style="background: var(--white); padding: 3rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                <div style="font-size: 3rem; margin-bottom: 0.75rem;">📦</div>
+                <h4 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">No products listed yet</h4>
+                <p style="color: var(--gray-600); margin-bottom: 1.5rem;">Start selling by adding your first product to the marketplace!</p>
+                <a th:href="@{/seller/products/new}" class="btn btn-primary">+ List First Product</a>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(products)}" class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">Image</th>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th style="text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="p, iterStat : ${products}" th:if="${iterStat.index < 5}">
+                            <td>
+                                <img th:src="${p.imageUrl}" th:alt="${p.name}" 
+                                     style="width: 48px; height: 48px; object-fit: cover; border-radius: var(--radius-sm); background: var(--gray-100);">
+                            </td>
+                            <td>
+                                <strong th:text="${p.name}" style="color: var(--dark); display: block;">Name</strong>
+                                <span style="font-size: 0.78rem; color: var(--gray-500); max-width: 280px; display: inline-block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"
+                                      th:text="${p.description}">Desc</span>
+                            </td>
+                            <td>
+                                <span class="card-badge-category" style="position: static; font-size: 0.75rem;" th:text="${p.category}">Category</span>
+                            </td>
+                            <td style="font-weight: 700; color: var(--dark);" th:text="'₹' + ${#numbers.formatDecimal(p.price, 1, 'COMMA', 2, 'POINT')}">₹0.00</td>
+                            <td>
+                                <span th:if="${p.stock > 0}" style="color: var(--accent-hover); font-weight: 700;" th:text="${p.stock}">10</span>
+                                <span th:if="${p.stock <= 0}" style="color: var(--danger); font-weight: 700;">0 (Out of stock)</span>
+                            </td>
+                            <td>
+                                <span th:if="${p.approvalStatus == 'APPROVED' or p.approvalStatus == null}" class="badge-status-active">Active</span>
+                                <span th:if="${p.approvalStatus == 'PENDING_APPROVAL'}" style="background-color: var(--warning-light); color: var(--warning); padding: 0.2rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700;">Pending</span>
+                                <span th:if="${p.approvalStatus == 'REJECTED'}" class="badge-status-disabled">Rejected</span>
+                            </td>
+                            <td style="text-align: right;">
+                                <a th:href="@{/seller/products/edit/{id}(id=${p.id})}" class="btn btn-outline" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+                                    ✏️ Edit
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recent Orders Section -->
+            <div class="section-header" style="margin-top: 2.5rem;">
+                <div>
+                    <h3 style="font-size: 1.35rem; font-weight: 700; color: var(--dark);">Orders Involving Your Products</h3>
+                    <p class="section-subtitle">Purchases made by customers for your store items</p>
+                </div>
+                <a th:href="@{/seller/orders}" class="btn btn-outline">View All Orders →</a>
+            </div>
+
+            <div th:if="${#lists.isEmpty(recentOrders)}" style="background: var(--white); padding: 2.5rem; text-align: center; border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                <p style="color: var(--gray-500);">No orders received yet for your listed products.</p>
+            </div>
+
+            <div th:unless="${#lists.isEmpty(recentOrders)}" class="data-table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer Name</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="order : ${recentOrders}">
+                            <td style="font-weight: 700; color: var(--primary);" th:text="'#DM-ORD-' + ${order.id}">#DM-ORD-1</td>
+                            <td style="font-weight: 600;" th:text="${order.customerName}">Customer</td>
+                            <td style="font-size: 0.85rem; color: var(--gray-600);" 
+                                th:text="${#temporals.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</td>
+                            <td>
+                                <span class="badge-stock stock-in" th:text="${order.status}">PLACED</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

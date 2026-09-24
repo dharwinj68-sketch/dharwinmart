@@ -93,6 +93,20 @@
                             <span class="card-stock-text" th:text="'Qty: ' + ${product.stock}">Qty: 10</span>
                         </div>
 
+                        <!-- Wishlist & Seller Row -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+                            <button type="button" class="btn-wishlist-toggle" 
+                                    th:classappend="${wishlistProductIds != null and wishlistProductIds.contains(product.id)} ? 'active' : ''"
+                                    th:data-product-id="${product.id}"
+                                    onclick="handleWishlistToggle(this)"
+                                    title="Save to Wishlist">
+                                <span class="heart-icon" th:text="${wishlistProductIds != null and wishlistProductIds.contains(product.id)} ? '♥' : '♡'">♡</span>
+                                <span class="wishlist-text" th:text="${wishlistProductIds != null and wishlistProductIds.contains(product.id)} ? 'Wishlisted' : 'Wishlist'">Wishlist</span>
+                            </button>
+                            <span th:if="${product.seller != null}" style="font-size: 0.75rem; color: var(--gray-500); font-weight: 500;" 
+                                  th:text="'Seller: ' + ${product.seller.fullName}">Seller</span>
+                        </div>
+
                         <!-- Card Action Buttons -->
                         <div class="card-actions">
                             <a th:href="@{/products/{id}(id=${product.id})}" class="btn btn-outline">

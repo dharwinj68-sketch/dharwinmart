@@ -58,3 +58,62 @@ function confirmAction(event, message) {
     }
     return true;
 }
+
+/**
+ * Handle AJAX Wishlist Toggle with instant optimistic UI update
+ */
+async function handleWishlistToggle(button) {
+    const productId = button.getAttribute('data-product-id');
+    if (!productId) return;
+
+    const heartIcon = button.querySelector('.heart-icon');
+    const wishlistText = button.querySelector('.wishlist-text');
+
+    const formData = new URLSearchParams();
+    formData.append('productId', productId);
+
+    try {
+        const response = await fetch('/wishlist/toggle', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData.toString()
+        });
+
+        if (response.status === 401) {
+            window.location.href = '/login?role=BUYER&error=auth_required';
+            return;
+        }
+
+        if (response.status === 403) {
+            const data = await response.json();
+            alert(data.message || 'Access Denied: Only Buyers can add items to a wishlist.');
+            return;
+        }
+
+        const data = await response.json();
+        if (data.success) {
+            if (data.wishlisted) {
+                button.classList.add('active');
+                if (heartIcon) heartIcon.textContent = '♥';
+                if (wishlistText) wishlistText.textContent = 'Wishlisted';
+            } else {
+                button.classList.remove('active');
+                if (heartIcon) heartIcon.textContent = '♡';
+                if (wishlistText) wishlistText.textContent = 'Wishlist';
+            }
+
+            // Update navbar badge if present
+            const navBadge = document.getElementById('navWishlistBadge');
+            if (navBadge) {
+                navBadge.textContent = data.count;
+            }
+        } else {
+            alert(data.message || 'Error updating wishlist.');
+        }
+    } catch (err) {
+        console.error('Wishlist error:', err);
+    }
+}
+

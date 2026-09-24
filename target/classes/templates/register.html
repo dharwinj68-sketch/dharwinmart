@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - DHARWINMART</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+    <!-- Header Navbar -->
+    <div th:replace="~{fragments/header :: navbar}"></div>
+
+    <!-- Main Content -->
+    <main class="main-content" style="display: flex; align-items: center; justify-content: center; min-height: 80vh; padding: 2.5rem 1rem;">
+        <div class="container" style="max-width: 520px;">
+
+            <!-- Flash Alerts -->
+            <div th:if="${errorMessage}" class="alert alert-danger">
+                <span th:text="${errorMessage}">Error message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}">Success message</span>
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+            </div>
+
+            <!-- Registration Card -->
+            <div class="form-card" style="padding: 2.25rem 2rem; box-shadow: var(--shadow-lg);">
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div class="brand-logo" style="justify-content: center; margin-bottom: 0.75rem;">
+                        <span class="brand-badge">DM</span>
+                        <span>DHARWINMART</span>
+                    </div>
+                    <h2 style="font-size: 1.45rem; font-weight: 800; color: var(--dark);">Create Your Account</h2>
+                    <p style="color: var(--gray-600); font-size: 0.88rem; margin-top: 0.25rem;">
+                        Join DHARWINMART as a Shopper or Seller
+                    </p>
+                </div>
+
+                <form th:action="@{/register}" method="post" id="registerForm">
+                    <!-- Account Role Selection (Buyer vs Seller Only) -->
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label class="form-label" style="font-weight: 700;">I want to join as:</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                            <label class="role-select-box" id="labelBuyer">
+                                <input type="radio" name="role" value="BUYER" th:checked="${selectedRole == 'BUYER'}" onchange="updateRoleUi('BUYER')">
+                                <span style="font-weight: 700; display: block;">👤 Buyer</span>
+                                <span style="font-size: 0.76rem; color: var(--gray-500);">Shop, wishlist & track orders</span>
+                            </label>
+                            <label class="role-select-box" id="labelSeller">
+                                <input type="radio" name="role" value="SELLER" th:checked="${selectedRole == 'SELLER'}" onchange="updateRoleUi('SELLER')">
+                                <span style="font-weight: 700; display: block;">🏪 Seller</span>
+                                <span style="font-size: 0.76rem; color: var(--gray-500);">List products & manage sales</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="fullName">Full Name or Store Name *</label>
+                        <input type="text" id="fullName" name="fullName" class="form-control" 
+                               placeholder="e.g. Dharwin J or Apex Tech" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username *</label>
+                        <input type="text" id="username" name="username" class="form-control" 
+                               placeholder="e.g. dharwin68" required minlength="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" class="form-control" 
+                               placeholder="e.g. dharwin@example.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password *</label>
+                        <input type="password" id="password" name="password" class="form-control" 
+                               placeholder="•••••••• (min 4 characters)" required minlength="4">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="phone">Phone Number</label>
+                        <input type="tel" id="phone" name="phone" class="form-control" 
+                               placeholder="e.g. 9876543210">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="address">Delivery / Business Address</label>
+                        <textarea id="address" name="address" class="form-control" rows="2" 
+                                  placeholder="Hostel, room, or office address..."></textarea>
+                    </div>
+
+                    <div style="margin-top: 1.75rem;">
+                        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem; font-size: 0.95rem;">
+                            Complete Registration →
+                        </button>
+                    </div>
+                </form>
+
+                <div style="text-align: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--gray-200); font-size: 0.88rem;">
+                    <span style="color: var(--gray-600);">Already have an account?</span>
+                    <a th:href="@{/login}" style="color: var(--primary); font-weight: 700; margin-left: 0.35rem;">
+                        Sign In here
+                    </a>
+                </div>
+            </div>
+
+            <!-- Back to Storefront Link -->
+            <div style="text-align: center; margin-top: 1.25rem;">
+                <a th:href="@{/}" style="font-size: 0.9rem; color: var(--gray-600); font-weight: 500;">
+                    ← Back to Storefront
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <div th:replace="~{fragments/footer :: footer}"></div>
+
+    <script th:src="@{/js/main.js}"></script>
+    <script>
+        function updateRoleUi(role) {
+            const b = document.getElementById('labelBuyer');
+            const s = document.getElementById('labelSeller');
+            if (role === 'BUYER') {
+                b.style.borderColor = 'var(--primary)';
+                b.style.backgroundColor = 'var(--primary-light)';
+                s.style.borderColor = 'var(--gray-300)';
+                s.style.backgroundColor = 'var(--white)';
+            } else {
+                s.style.borderColor = 'var(--primary)';
+                s.style.backgroundColor = 'var(--primary-light)';
+                b.style.borderColor = 'var(--gray-300)';
+                b.style.backgroundColor = 'var(--white)';
+            }
+        }
+        // Initialize active radio styling
+        const checked = document.querySelector('input[name="role"]:checked');
+        if (checked) {
+            updateRoleUi(checked.value);
+        }
+    </script>
+</body>
+</html>
